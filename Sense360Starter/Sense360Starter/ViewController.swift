@@ -34,7 +34,7 @@ class ViewController: UIViewController {
         let errorPointer = SenseSdkErrorPointer.create()
         // This method should only be used for testing
         SenseSdkTestUtility.fireTrigger(
-            fromRecipe: "ArrivedAtRestaurant",
+            "ArrivedAtRestaurant",
             confidenceLevel: ConfidenceLevel.Medium,
             places: [place],
             errorPtr: errorPointer
@@ -53,7 +53,7 @@ class ViewController: UIViewController {
         let errorPointer = SenseSdkErrorPointer.create()
         // This method should only be used for testing
         SenseSdkTestUtility.fireTrigger(
-            fromRecipe: "ArrivedAtHome",
+            "ArrivedAtHome",
             confidenceLevel: ConfidenceLevel.Medium,
             places: [place],
             errorPtr: errorPointer
@@ -78,7 +78,7 @@ class ViewController: UIViewController {
         
         // This method should only be used for testing
         SenseSdkTestUtility.fireTrigger(
-            fromRecipe: "ArrivedAtGeofence",
+            "ArrivedAtGeofence",
             confidenceLevel: ConfidenceLevel.Medium,
             places: [hq, lunchSpot],
             errorPtr: errorPointer

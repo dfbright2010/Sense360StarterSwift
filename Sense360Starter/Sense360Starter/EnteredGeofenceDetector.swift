@@ -9,7 +9,7 @@
 import UIKit
 import SenseSdk
 
-class EnteredGeofenceDetector: RecipeFiredDelegate {
+class EnteredGeofenceDetector: TriggerFiredDelegate {
     
     func geofenceDetectionStart() {
         let errorPointer = SenseSdkErrorPointer.create()
@@ -19,38 +19,28 @@ class EnteredGeofenceDetector: RecipeFiredDelegate {
         let lunchSpot = CustomGeofence(latitude: 37.124, longitude: -127.456, radius: 50, customIdentifier: "A&B Bar and Grill")
         
         // Fire on both hq and lunchSpot
-        let trigger: Trigger? = FireTrigger.whenEntersGeofences([hq, lunchSpot])
+        let trigger: Trigger? = FireTrigger.whenEntersGeofences("ArrivedAtGeofence", geofences: [hq, lunchSpot])
         
         if let geofenceTrigger = trigger {
-            // Recipe defines what trigger, what time of day and how long to wait between consecutive firings
-            let geofenceRecipe = Recipe(name: "ArrivedAtGeofence",
-                trigger: geofenceTrigger,
-                // Do NOT restrict the firing to a particular time of day
-                timeWindow: TimeWindow.allDay,
-                // Wait at least 1 hour between consecutive triggers firing.
-                cooldown: Cooldown.create(oncePer: 1, frequency: CooldownTimeUnit.Hours)!)
-            
             // register the unique recipe and specify that when the trigger fires it should call our own "onTriggerFired" method below
-            SenseSdk.register(recipe: geofenceRecipe, delegate: self)
+            SenseSdk.register(trigger: geofenceTrigger, delegate: self)
         }
     }
     
     
-    @objc func recipeFired(args: RecipeFiredArgs) {
+    @objc func triggerFired(args: TriggerFiredArgs) {
         
         // Your user has entered a geofence!
         
-        NSLog("Recipe \(args.recipe.name) fired at \(args.timestamp).");
-        for trigger in args.triggersFired {
-            for place in trigger.places {
+        NSLog("Recipe \(args.trigger.name) fired at \(args.timestamp).");
+        for place in args.places {
 
-                //This is where YOU write your custom code.
-                //As an example, we are sending a local notification that describes the transition type and place.
-                //For more information go to: http://sense360.com/docs.html#handling-a-recipe-firing
-                let transitionDesc = args.recipe.trigger.transitionType.description
-                NotificationSender.send("\(transitionDesc) \(place.description)")
-                
-            }
+            //This is where YOU write your custom code.
+            //As an example, we are sending a local notification that describes the transition type and place.
+            //For more information go to: http://sense360.com/docs.html#handling-a-recipe-firing
+            let transitionDesc = args.trigger.transitionType.description
+            NotificationSender.send("\(transitionDesc) \(place.description)")
+            
         }
     }
 }

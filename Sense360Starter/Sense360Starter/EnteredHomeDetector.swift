@@ -9,24 +9,16 @@
 import UIKit
 import SenseSdk
 
-class EnteredHomeDetector: RecipeFiredDelegate {
+class EnteredHomeDetector: TriggerFiredDelegate {
    
     func homeDetectionStart() {
         let errorPointer = SenseSdkErrorPointer.create()
         // Fire when the user enters home
-        let trigger = FireTrigger.whenEntersPersonalizedPlace(.Home, errorPtr: errorPointer)
+        let trigger = FireTrigger.whenEntersPersonalizedPlace("ArrivedAtHome", type: .Home, errorPtr: errorPointer)
         
         if let homeTrigger = trigger {
-            // Recipe defines what trigger, what time of day and how long to wait between consecutive firings
-            let homeRecipe = Recipe(name: "ArrivedAtHome",
-                trigger: homeTrigger,
-                // Do NOT restrict the firing to a particular time of day
-                timeWindow: TimeWindow.allDay,
-                // Wait at least 1 hour between consecutive triggers firing.
-                cooldown: Cooldown.create(oncePer: 1, frequency: CooldownTimeUnit.Hours)!)
-            
             // register the unique recipe and specify that when the trigger fires it should call our own "onTriggerFired" method below
-            SenseSdk.register(recipe: homeRecipe, delegate: self)
+            SenseSdk.register(trigger: homeTrigger, delegate: self)
         }
         
         if errorPointer.error != nil {
@@ -35,22 +27,20 @@ class EnteredHomeDetector: RecipeFiredDelegate {
 
     }
     
-    @objc func recipeFired(args: RecipeFiredArgs) {
+    @objc func triggerFired(args: TriggerFiredArgs) {
         
         // Your user has entered at home!
         
-        NSLog("Recipe \(args.recipe.name) fired at \(args.timestamp).");
-        for trigger in args.triggersFired {
-            for place in trigger.places {
-                NSLog(place.description)
-                
-                //This is where YOU write your custom code.
-                //As an example, we are sending a local notification that describes the transition type and place.
-                //For more information go to: http://sense360.com/docs.html#handling-a-recipe-firing
-                let transitionDesc = args.recipe.trigger.transitionType.description
-                NotificationSender.send("\(transitionDesc) \(place.description)")
-                
-            }
+        NSLog("Trigger \(args.trigger.name) fired at \(args.timestamp).");
+        for place in args.places {
+            NSLog(place.description)
+            
+            //This is where YOU write your custom code.
+            //As an example, we are sending a local notification that describes the transition type and place.
+            //For more information go to: http://sense360.com/docs.html#handling-a-recipe-firing
+            let transitionDesc = args.trigger.transitionType.description
+            NotificationSender.send("\(transitionDesc) \(place.description)")
+            
         }
     }
 }
